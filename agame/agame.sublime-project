@@ -1,0 +1,22 @@
+{
+	"folders":
+	[
+		{
+			"path": "/Users/william/devel/agame"
+		},
+		{
+			"path": "/Users/william/devel/allegro_tiled"
+		}
+	],
+	"settings":
+	{
+		"sublimeclang_options":
+		[
+			"-I/usr/include",
+			"-I/usr/local/include",
+			"-I${folder:${project_path:agame.sublime-project}}/include"
+		]
+	},
+	"word_wrap": "on",
+	"wrap_width": 80
+}
