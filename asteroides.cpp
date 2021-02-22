@@ -93,13 +93,13 @@ int main()
                     BOUNCER* b = &obj[i];
                     b->x += b->dx;
                     b->y += b->dy;
-                    b->r += 0.5*abs(fmin(b->dx, b->dy));
+                    b->r += (abs(b->x/640) +abs(b->y/480))*0.1;
 
                     if(b->x < 0)
                     {
                         b->x = 640/2;
                         b->y = 480/2;
-                        b->r = 10;
+                        b->r = 5;
                         b->dx = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4;
                         b->dy = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4;
                     }
@@ -107,7 +107,7 @@ int main()
                     {
                         b->x = 640/2;
                         b->y = 480/2;
-                        b->r = 10;
+                        b->r = 5;
                         b->dx = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4;
                         b->dy = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4;
                     }
@@ -115,7 +115,7 @@ int main()
                     {
                         b->x = 640/2;
                         b->y = 480/2;
-                        b->r = 10;
+                        b->r = 5;
                         b->dx = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4;
                         b->dy = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4;
                     }
@@ -123,7 +123,7 @@ int main()
                     {
                         b->x = 640/2;
                         b->y = 480/2;
-                        b->r = 10;
+                        b->r = 5;
                         b->dx = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4;
                         b->dy = ((((float)rand()) / RAND_MAX) - 0.5) * 2 * 4;
                     }
