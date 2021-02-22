@@ -15,13 +15,6 @@ void must_init(bool test, const char *description)
 
 enum BOUNCER_TYPE {
     BT_HELLO = 0,
-    BT_MYSHA,
-    BT_TRIANGLE,
-    BT_RECTANGLE_1,
-    BT_RECTANGLE_2,
-    BT_CIRCLE,
-    BT_LINE1,
-    BT_LINE2,
     BT_N
 };
 
@@ -97,9 +90,9 @@ int main()
                         b->x  *= -1;
                         b->dx *= -1;
                     }
-                    if(b->x > 640)
+                    if(b->x > 545)
                     {
-                        b->x -= (b->x - 640);
+                        b->x -= (b->x - 545);
                         b->dx *= -1;
                     }
                     if(b->y < 0)
@@ -107,9 +100,9 @@ int main()
                         b->y  *= -1;
                         b->dy *= -1;
                     }
-                    if(b->y > 480)
+                    if(b->y > 470)
                     {
-                        b->x -= (b->y - 480);
+                        b->x -= (b->y - 470);
                         b->dy *= -1;
                     }
                 }
@@ -138,39 +131,6 @@ int main()
                 {
                     case BT_HELLO:
                         al_draw_text(font, al_map_rgb(255, 255, 255), b->x, b->y, 0, "Hello world!");
-                        break;
-
-                    case BT_MYSHA:
-                        al_draw_bitmap(mysha, b->x, b->y, 0);
-                        break;
-
-                    case BT_TRIANGLE:
-                        al_draw_filled_triangle(b->x, b->y, b->x + 50, b->y + 25, b->x, b->y + 50, al_map_rgb_f(0, 1, 0));
-                        break;
-
-                    case BT_RECTANGLE_1:
-                        al_draw_filled_rectangle(b->x, b->y, b->x + 100, b->y + 80, al_map_rgba_f(0, 0, 0.5, 0.5));
-                        break;
-
-                    case BT_RECTANGLE_2:
-                        v[0].x = b->x;       v[0].y = b->y;       v[0].z = 0; v[0].color = al_map_rgb_f(1, 0, 0);
-                        v[1].x = b->x + 120; v[1].y = b->y;       v[1].z = 0; v[1].color = al_map_rgb_f(0, 1, 0);
-                        v[2].x = b->x;       v[2].y = b->y + 100; v[2].z = 0; v[2].color = al_map_rgb_f(0, 0, 1);
-                        v[3].x = b->x + 120; v[3].y = b->y + 100; v[3].z = 0; v[3].color = al_map_rgb_f(1, 1, 0);
-
-                        al_draw_prim(v, NULL, NULL, 0, 4, ALLEGRO_PRIM_TRIANGLE_STRIP);
-                        break;
-
-                    case BT_CIRCLE:
-                        al_draw_circle(b->x, b->y, 30, al_map_rgb_f(1, 0, 1), 2);
-                        break;
-
-                    case BT_LINE1:
-                        al_draw_line(b->x, b->y, b->x + 20, b->y + 100, al_map_rgb_f(1, 0, 0), 1);
-                        break;
-
-                    case BT_LINE2:
-                        al_draw_line(b->x, b->y, b->x + 70, b->y - 20, al_map_rgb_f(1, 1, 0), 1);
                         break;
                 }
             }
