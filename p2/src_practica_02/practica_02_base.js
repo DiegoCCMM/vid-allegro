@@ -133,8 +133,12 @@ var programInfo = {
 			attribLocations: {},
 };
 
+// TODO: establecer 20
+var nCubes = 8;
+
 var objectsToDraw = [
 		{
+			// Ejes de coordenadas
 		  programInfo: programInfo,
 		  pointsArray: pointsAxes, 
 		  colorsArray: colorsAxes, 
@@ -146,6 +150,7 @@ var objectsToDraw = [
 		  // Se puede anyadir cualquier otra informacion que se considere necesaria.
 		},
 		{
+			// Cubo delineado blanco 
 		  programInfo: programInfo,
 		  pointsArray: pointsWireCube,
 		  colorsArray: colorsWireCube, 
@@ -154,7 +159,8 @@ var objectsToDraw = [
 			u_model: new mat4(),
 		  },
 		  primType: "line_strip",
-		},	
+		},
+		// CUBOS INICIALES
 		{
 		  programInfo: programInfo,
 		  pointsArray: pointsCube, 
@@ -174,7 +180,7 @@ var objectsToDraw = [
 			u_model: new mat4(),
 		  },
 		  primType: "triangles",
-		},				
+		},
 ];
 
 //----------------------------------------------------------------------------
@@ -193,6 +199,21 @@ window.onload = function init() {
 	//  Configure WebGL
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 	gl.enable(gl.DEPTH_TEST);
+
+	// CUBOS PRACTICA 2
+	for(var i=4; i<nCubes; i++){
+		objectsToDraw[i] = {
+			programInfo: programInfo,
+			pointsArray: pointsCube, 
+			colorsArray: colorsCube, 
+			uniforms: {
+				// TODO: crear alguna regla para crear los colores de los 20 cubos diferentes
+			  u_colorMult: [i/nCubes, 0.0, 0.0, i/nCubes],
+			  u_model: new mat4(),
+			},
+			primType: "triangles",
+		  };
+	}
 
 	setPrimitive(objectsToDraw);
 
@@ -255,6 +276,16 @@ function render() {
 	
 	objectsToDraw[3].uniforms.u_model = translate(1.0, 0.0, 3.0);
 	objectsToDraw[3].uniforms.u_model = mult(R, objectsToDraw[3].uniforms.u_model);
+
+	for(var i=4; i<nCubes; i++){ç
+		// TransformedV = TranslationMatrix*RotationMatrix*ScaleMatrix*OriginalV
+		// R = RotationMatrix (recalcular aleatoriamente?)
+		// T = TranslationMatrix
+		let T = translate(); // TODO: function translate( x, y, z )
+		objectsToDraw[i].uniforms.u_model = translate(1.0+i/2, 0.0+i/2, 3.0); // Cambiar
+		ModelMatrix = mult(T, R);
+		objectsToDraw[i].uniforms.u_model = mult(ModelMatrix, objectsToDraw[i].uniforms.u_model);
+	}
 	
 	//----------------------------------------------------------------------------
 	// DRAW
