@@ -1,9 +1,9 @@
 # Project exclude paths
-/cmake-build-debug/
-CMakeLists.txt
-.idea/vcs.xml
-.idea/dictionaries/patri.xml
-.idea/.name
-CMakeLists.txt
-CMakeLists.txt
-CMakeLists.txt
+p1/cmake-build-debug/
+p1/CMakeLists.txt
+p1/.idea/vcs.xml
+p1/.idea/dictionaries/patri.xml
+p1/.idea/.name
+p1/CMakeLists.txt
+p1/CMakeLists.txt
+p1/CMakeLists.txt
