@@ -134,7 +134,7 @@ var programInfo = {
 };
 
 // TODO: establecer 20
-var nCubes = 8;
+var nCubes = 20;
 
 var objectsToDraw = [
 		{
@@ -199,16 +199,22 @@ window.onload = function init() {
 	//  Configure WebGL
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 	gl.enable(gl.DEPTH_TEST);
-
+	
 	// CUBOS PRACTICA 2
 	for(var i=4; i<nCubes; i++){
 		objectsToDraw[i] = {
 			programInfo: programInfo,
 			pointsArray: pointsCube, 
-			colorsArray: colorsCube, 
+			colorsArray: [	
+	[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
+	[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
+	[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
+	[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
+	[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
+	[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
+],
 			uniforms: {
-				// TODO: crear alguna regla para crear los colores de los 20 cubos diferentes
-			  u_colorMult: [i/nCubes, 0.0, 0.0, i/nCubes],
+			  u_colorMult: [1.0, 1.0, 1.0, 1.0],
 			  u_model: new mat4(),
 			},
 			primType: "triangles",
@@ -277,26 +283,19 @@ function render() {
 	let T = translate(1.0, 1.0, 3.0);
 	objectsToDraw[2].uniforms.u_model = mult(T, R);
 	
-	// Cubo que gira sobre si mismo
-	T = translate(1.0, 0.0, 3.0);
-	objectsToDraw[3].uniforms.u_model = mult(R, T);
 
-	// SOLUCION FINAL GIRO CUBOS (TODO: quitar en un futuro)
-	T = translate(3.0, 1.0, 3.0);
-	objectsToDraw[4].uniforms.u_model = mult(T, R);
-	// Ademas de realizar primero la rotacion y traslacion, es necesario
-	// rotarlo de nuevo para hacer que gire sobre si mismo
-	objectsToDraw[4].uniforms.u_model = mult(R, objectsToDraw[4].uniforms.u_model);
+	objectsToDraw[3].uniforms.u_model = translate(1.0, 0.0, 3.0);
+	objectsToDraw[3].uniforms.u_model = mult(R, objectsToDraw[3].uniforms.u_model);
 
-	/*for(var i=4; i<nCubes; i++){
+	for(var i=4; i<nCubes; i++){
 		// TransformedV = TranslationMatrix*RotationMatrix*ScaleMatrix*OriginalV
-		// R = rotate(rotAngle, vec3(0.0, 0.0, 0.0)); (recalcular aleatoriamente si queremos)
-		// T = translate(, , );
-		objectsToDraw[i].uniforms.u_model = mult(T, R);
-		// Ademas de realizar primero la rotacion y traslacion, es necesario
-		// rotarlo de nuevo para hacer que gire sobre si mismo
+		// R = RotationMatrix (recalcular aleatoriamente?)
+		// T = TranslationMatrix
+		//let T = translate(); // TODO: function translate( x, y, z )
+		objectsToDraw[i].uniforms.u_model = translate(1.0+i/2, 0.0+i/2, 3.0); // Cambiar
+		//ModelMatrix = mult(T, R);
 		objectsToDraw[i].uniforms.u_model = mult(R, objectsToDraw[i].uniforms.u_model);
-	}*/
+	}
 	
 	//----------------------------------------------------------------------------
 	// DRAW
