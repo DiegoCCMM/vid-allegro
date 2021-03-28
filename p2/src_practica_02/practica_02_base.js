@@ -271,21 +271,32 @@ function render() {
 	let ejeY = vec3(0.0, 1.0, 0.0);
 	let R = rotate(rotAngle, ejeY);	
 
-	objectsToDraw[2].uniforms.u_model = translate(1.0, 1.0, 3.0);
-	objectsToDraw[2].uniforms.u_model = mult(objectsToDraw[2].uniforms.u_model, R);
+	// Cubo que gira entorno al eje de coordenadas
+	// Esto se debe a que solo se hace la rotacion y luego la traslacion
+	// haciendo que el cubo gire solamente sobre el eje (se adapta al movimiento)
+	let T = translate(1.0, 1.0, 3.0);
+	objectsToDraw[2].uniforms.u_model = mult(T, R);
 	
-	objectsToDraw[3].uniforms.u_model = translate(1.0, 0.0, 3.0);
-	objectsToDraw[3].uniforms.u_model = mult(R, objectsToDraw[3].uniforms.u_model);
+	// Cubo que gira sobre si mismo
+	T = translate(1.0, 0.0, 3.0);
+	objectsToDraw[3].uniforms.u_model = mult(R, T);
 
-	for(var i=4; i<nCubes; i++){ç
+	// SOLUCION FINAL GIRO CUBOS (TODO: quitar en un futuro)
+	T = translate(3.0, 1.0, 3.0);
+	objectsToDraw[4].uniforms.u_model = mult(T, R);
+	// Ademas de realizar primero la rotacion y traslacion, es necesario
+	// rotarlo de nuevo para hacer que gire sobre si mismo
+	objectsToDraw[4].uniforms.u_model = mult(R, objectsToDraw[4].uniforms.u_model);
+
+	/*for(var i=4; i<nCubes; i++){
 		// TransformedV = TranslationMatrix*RotationMatrix*ScaleMatrix*OriginalV
-		// R = RotationMatrix (recalcular aleatoriamente?)
-		// T = TranslationMatrix
-		let T = translate(); // TODO: function translate( x, y, z )
-		objectsToDraw[i].uniforms.u_model = translate(1.0+i/2, 0.0+i/2, 3.0); // Cambiar
-		ModelMatrix = mult(T, R);
-		objectsToDraw[i].uniforms.u_model = mult(ModelMatrix, objectsToDraw[i].uniforms.u_model);
-	}
+		// R = rotate(rotAngle, vec3(0.0, 0.0, 0.0)); (recalcular aleatoriamente si queremos)
+		// T = translate(, , );
+		objectsToDraw[i].uniforms.u_model = mult(T, R);
+		// Ademas de realizar primero la rotacion y traslacion, es necesario
+		// rotarlo de nuevo para hacer que gire sobre si mismo
+		objectsToDraw[i].uniforms.u_model = mult(R, objectsToDraw[i].uniforms.u_model);
+	}*/
 	
 	//----------------------------------------------------------------------------
 	// DRAW
