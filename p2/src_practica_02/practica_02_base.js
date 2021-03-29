@@ -108,9 +108,35 @@ const colorsCube = [
 	blue, blue, blue, blue, blue, blue,
 	red, red, red, red, red, red,
 	green, green, green, green, green, green,
-];	
+];
+
+const nCubes = 20;
 
 const cubeTraslation = [];
+for(var i=0; i<nCubes; i++){
+	let a = Math.floor(Math.random() * (6 - 0.1)) + 0.1;
+	let b = Math.floor(Math.random() * (6 - 0.1)) + 0.1;
+	let c = Math.floor(Math.random() * (6 - 0.1)) + 0.1;
+
+	if (i %2 == 0) a *= -1;
+	if (i %3 == 0) b *= -1;
+	if (i %5 == 0) c *= -1;
+
+	cubeTraslation[i] = [a, b, c];
+}
+
+const cubeRotAngle = [];
+for(var i=0; i<nCubes; i++){
+	cubeRotAngle[i] = 0.0;
+}
+
+const cubeRotChange = [];
+for(var i=0; i<nCubes; i++){
+	let num = Math.floor(Math.random() * (1.0 - 0.4)) + 0.4;
+	if (i%2 == 0) num *= -1;
+
+	cubeRotChange[i] = num;
+}
 
 //----------------------------------------------------------------------------
 // OTHER DATA 
@@ -134,9 +160,6 @@ var programInfo = {
 			uniformLocations: {},
 			attribLocations: {},
 };
-
-// TODO: establecer 20
-var nCubes = 20;
 
 var objectsToDraw = [
 		{
@@ -185,6 +208,28 @@ var objectsToDraw = [
 		},
 ];
 
+// Los 20 cubos
+for(var j=0; j<nCubes; j++){
+	var i = j+4;
+	objectsToDraw[i] = {
+		programInfo: programInfo,
+		pointsArray: pointsCube, 
+		colorsArray: [	
+[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
+[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
+[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
+[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
+[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
+[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
+],
+		uniforms: {
+		  u_colorMult: [1.0, 1.0, 1.0, 1.0],
+		  u_model: new mat4(),
+		},
+		primType: "triangles",
+	  };
+}
+
 //----------------------------------------------------------------------------
 // Initialization function
 //----------------------------------------------------------------------------
@@ -201,37 +246,6 @@ window.onload = function init() {
 	//  Configure WebGL
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 	gl.enable(gl.DEPTH_TEST);
-	
-	// CUBOS PRACTICA 2
-	for(var j=0; j<nCubes; j++){
-		var i = j+4;
-		objectsToDraw[i] = {
-			programInfo: programInfo,
-			pointsArray: pointsCube, 
-			colorsArray: [	
-	[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
-	[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
-	[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
-	[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
-	[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
-	[i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0], [i/nCubes, 1.0 - i/nCubes, i/nCubes, 1.0],
-],
-			uniforms: {
-			  u_colorMult: [1.0, 1.0, 1.0, 1.0],
-			  u_model: new mat4(),
-			},
-			primType: "triangles",
-		  };
-	}
-
-	// Crear posiciones de traslacion aleatorias para los nCubes
-	for(var i=0; i<nCubes; i++){
-		let a = Math.floor(Math.random() * 8) - Math.floor(Math.random() * 8);
-		let b = Math.floor(Math.random() * 8) - Math.floor(Math.random() * 8);
-		let c = Math.floor(Math.random() * 8) - Math.floor(Math.random() * 8);
-
-		cubeTraslation[i] = [a, b, c];
-	}
 
 	setPrimitive(objectsToDraw);
 
@@ -300,13 +314,15 @@ function render() {
 	for(var j=0; j<nCubes; j++){
 		var i = j+4;
 		// TransformedV = TranslationMatrix*RotationMatrix*ScaleMatrix*OriginalV
-		R = rotate(rotAngle, vec3(i%2, i%3, i%5));
+		R = rotate(cubeRotAngle[j], vec3(i%2, i%3, i%5));
 		T = translate(cubeTraslation[j][0], cubeTraslation[j][1], cubeTraslation[j][2]);
 		
 		objectsToDraw[i].uniforms.u_model = mult(T, R);
 		// Ademas de realizar primero la rotacion y traslacion, es necesario
 		// rotarlo de nuevo para hacer que gire sobre el eje de coordenadas
 		objectsToDraw[i].uniforms.u_model = mult(R, objectsToDraw[i].uniforms.u_model);
+
+		cubeRotAngle[j] += cubeRotChange[j];
 	}
 	
 	//----------------------------------------------------------------------------
