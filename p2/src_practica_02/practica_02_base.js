@@ -147,6 +147,8 @@ var view = new mat4();   		// create a view matrix and set it to the identity ma
 var projection = new mat4();	// create a projection matrix and set it to the identity matrix
 
 var eye, target, up;			// for view matrix
+var z = 16.0;
+var aux = 1.0;
 
 var rotAngle = 0.0;
 var rotChange = 0.6;
@@ -283,12 +285,35 @@ window.onload = function init() {
 	gl.uniformMatrix4fv(programInfo.uniformLocations.view, gl.FALSE, view); // copy view to uniform value in shader
 	
 	requestAnimFrame(render);
-  
+	
 };
 
 //----------------------------------------------------------------------------
 // Rendering Event Function
 //----------------------------------------------------------------------------
+var uuuu = 3.0;
+var aux = 1;
+window.addEventListener('keydown', function(event) {
+	switch(event.code){
+		case 'ArrowUp':
+			z--;
+			/*for(var i=0; i<nCubes; i++){
+				cubeTraslation[i][2]--;
+			}
+			uuuu--;*/
+			aux = -1;
+			break;
+		
+		case 'ArrowDown':
+			z++;
+			/*for(var i=0; i<nCubes; i++){
+				cubeTraslation[i][2]++;
+			}
+			uuuu++;*/
+			aux = 1;
+			break;
+	}
+});
 
 function render() {
 
@@ -304,8 +329,14 @@ function render() {
 	let R = rotate(rotAngle, ejeY);	
 
 	// Cubo que gira sobre si mismo
-	let T = translate(1.0, 1.0, 3.0);
-	objectsToDraw[2].uniforms.u_model = mult(T, R);
+	let T = translate(1.0, 1.0, uuuu);
+	objectsToDraw[2].uniforms.u_model = T;
+
+	let cambioPosicionZ = mat4();
+
+	cambioPosicionZ[2][3] = aux;
+	objectsToDraw[2].uniforms.u_model = mult(inverse4(cambioPosicionZ),objectsToDraw[2].uniforms.u_model);
+	aux = 0;
 	
 	// Cubo que gira entorno al eje de coordenadas
 	T = translate(1.0, 0.0, 3.0);
@@ -344,6 +375,17 @@ function render() {
     });	
     
 	rotAngle += rotChange;
+
+	// Set up camera
+	// Projection matrix
+	//projection = perspective( 45.0, canvas.width/canvas.height, 0.1, 100.0 );
+	//gl.uniformMatrix4fv( programInfo.uniformLocations.projection, gl.FALSE, projection ); // copy projection to uniform value in shader
+	// View matrix (vista cam)
+	eye = vec3(-5.0, 5.0, z);
+	target =  vec3(0.0, 0.0, 0.0);
+	up =  vec3(0.0, 1.0, 0.0);
+	view = lookAt(eye,target,up);
+	gl.uniformMatrix4fv(programInfo.uniformLocations.view, gl.FALSE, view);
 	
 	requestAnimationFrame(render);
 	
