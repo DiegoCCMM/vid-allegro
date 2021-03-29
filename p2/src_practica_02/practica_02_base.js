@@ -110,6 +110,8 @@ const colorsCube = [
 	green, green, green, green, green, green,
 ];	
 
+const cubeTraslation = [];
+
 //----------------------------------------------------------------------------
 // OTHER DATA 
 //----------------------------------------------------------------------------
@@ -121,7 +123,7 @@ var projection = new mat4();	// create a projection matrix and set it to the ide
 var eye, target, up;			// for view matrix
 
 var rotAngle = 0.0;
-var rotChange = 0.5;
+var rotChange = 0.6;
 
 var program;
 var uLocations = {};
@@ -201,7 +203,8 @@ window.onload = function init() {
 	gl.enable(gl.DEPTH_TEST);
 	
 	// CUBOS PRACTICA 2
-	for(var i=4; i<nCubes; i++){
+	for(var j=0; j<nCubes; j++){
+		var i = j+4;
 		objectsToDraw[i] = {
 			programInfo: programInfo,
 			pointsArray: pointsCube, 
@@ -219,6 +222,15 @@ window.onload = function init() {
 			},
 			primType: "triangles",
 		  };
+	}
+
+	// Crear posiciones de traslacion aleatorias para los nCubes
+	for(var i=0; i<nCubes; i++){
+		let a = Math.floor(Math.random() * 8) - Math.floor(Math.random() * 8);
+		let b = Math.floor(Math.random() * 8) - Math.floor(Math.random() * 8);
+		let c = Math.floor(Math.random() * 8) - Math.floor(Math.random() * 8);
+
+		cubeTraslation[i] = [a, b, c];
 	}
 
 	setPrimitive(objectsToDraw);
@@ -250,7 +262,7 @@ window.onload = function init() {
 	projection = perspective( 45.0, canvas.width/canvas.height, 0.1, 100.0 );
 	gl.uniformMatrix4fv( programInfo.uniformLocations.projection, gl.FALSE, projection ); // copy projection to uniform value in shader
     // View matrix (static cam)
-	eye = vec3(-5.0, 5.0, 10.0);
+	eye = vec3(-5.0, 5.0, 16.0);
 	target =  vec3(0.0, 0.0, 0.0);
 	up =  vec3(0.0, 1.0, 0.0);
 	view = lookAt(eye,target,up);
@@ -277,23 +289,23 @@ function render() {
 	let ejeY = vec3(0.0, 1.0, 0.0);
 	let R = rotate(rotAngle, ejeY);	
 
-	// Cubo que gira entorno al eje de coordenadas
-	// Esto se debe a que solo se hace la rotacion y luego la traslacion
-	// haciendo que el cubo gire solamente sobre el eje (se adapta al movimiento)
+	// Cubo que gira sobre si mismo
 	let T = translate(1.0, 1.0, 3.0);
 	objectsToDraw[2].uniforms.u_model = mult(T, R);
 	
+	// Cubo que gira entorno al eje de coordenadas
+	T = translate(1.0, 0.0, 3.0);
+	objectsToDraw[3].uniforms.u_model = mult(R, T);
 
-	objectsToDraw[3].uniforms.u_model = translate(1.0, 0.0, 3.0);
-	objectsToDraw[3].uniforms.u_model = mult(R, objectsToDraw[3].uniforms.u_model);
-
-	for(var i=4; i<nCubes; i++){
+	for(var j=0; j<nCubes; j++){
+		var i = j+4;
 		// TransformedV = TranslationMatrix*RotationMatrix*ScaleMatrix*OriginalV
-		// R = RotationMatrix (recalcular aleatoriamente?)
-		// T = TranslationMatrix
-		//let T = translate(); // TODO: function translate( x, y, z )
-		objectsToDraw[i].uniforms.u_model = translate(1.0+i/2, 0.0+i/2, 3.0); // Cambiar
-		//ModelMatrix = mult(T, R);
+		R = rotate(rotAngle, vec3(i%2, i%3, i%5));
+		T = translate(cubeTraslation[j][0], cubeTraslation[j][1], cubeTraslation[j][2]);
+		
+		objectsToDraw[i].uniforms.u_model = mult(T, R);
+		// Ademas de realizar primero la rotacion y traslacion, es necesario
+		// rotarlo de nuevo para hacer que gire sobre el eje de coordenadas
 		objectsToDraw[i].uniforms.u_model = mult(R, objectsToDraw[i].uniforms.u_model);
 	}
 	
