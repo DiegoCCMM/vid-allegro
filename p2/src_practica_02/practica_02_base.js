@@ -141,6 +141,7 @@ for(var i=0; i<nCubes; i++){
 //----------------------------------------------------------------------------
 // OTHER DATA 
 //----------------------------------------------------------------------------
+var width, height;
 
 var model = new mat4();   		// create a model matrix and set it to the identity matrix
 var view = new mat4();   		// create a view matrix and set it to the identity matrix
@@ -238,6 +239,7 @@ window.onload = function init() {
 	
 	// Set up a WebGL Rendering Context in an HTML5 Canvas
 	var canvas = document.getElementById("gl-canvas");
+	width = canvas.width, height = canvas.height;
 	gl = WebGLUtils.setupWebGL(canvas);
 	if (!gl) {
 		alert("WebGL isn't available");
@@ -272,7 +274,7 @@ window.onload = function init() {
 
 	// Set up camera
 	// Projection matrix
-	// Se crean las matrices de proyección y de la vista iniciales (se podrán cambiar luego en la función de render si es necesario).
+	// Se crean las matrices de proyección y de la vista iniciales
 	projection = perspective( 45.0, canvas.width/canvas.height, 0.1, 100.0 );
 	gl.uniformMatrix4fv( programInfo.uniformLocations.projection, gl.FALSE, projection ); // copy projection to uniform value in shader
     // View matrix (static cam)
@@ -290,29 +292,115 @@ window.onload = function init() {
 // Manejo de interacciones
 //----------------------------------------------------------------------------
 
+// Teclas
 window.addEventListener('keydown', function(event) {
-	x = 0, z = 0;
+	let x = 0, z = 0;
 	switch(event.code){
 		case 'ArrowUp':
+			console.log("Up pressed");
 			z = -0.3;
 			break;
 		
 		case 'ArrowDown':
+			console.log("Down pressed");
 			z = 0.3;
 			break;
 
 		case 'ArrowRight':
+			console.log("Right pressed");
 			x = 0.3;
 			break;
 
 		case 'ArrowLeft':
+			console.log("Left pressed");
 			x = -0.3;
+			break;
+
+		case 'KeyP':
+			console.log("P pressed");
+			break;
+
+		case 'KeyO':
+			console.log("O pressed");
+			break;
+
+		case 'NumpadAdd':
+		case 'BracketRight':
+			console.log("+ pressed");
+			break;
+
+		case 'NumpadSubtract':
+		case 'Slash':
+			console.log("- pressed");
 			break;
 	}
 
 	// Set up camera
 	view = mult(inverse4(translate(x, 0, z)), view);
 	gl.uniformMatrix4fv(programInfo.uniformLocations.view, gl.FALSE, view);
+});
+
+// Raton
+var isClicked = false;
+var center;
+var aux_view;
+var pitch, yaw;
+
+window.addEventListener('mousedown', function(event) {
+	if(event.button == 0){
+		console.log("Mouse down");
+		isClicked = true;
+
+		pitch = 0.0, yaw = 0.0;
+		center = [event.clientX, event.clientY];
+	}
+});
+
+window.addEventListener('mouseup', function(event) {
+	if(event.button == 0){
+		console.log("Mouse up");
+		isClicked = false;
+
+		// Una vez finalizada la rotacion de la camara, se actualiza la nueva view
+		view = aux_view; 
+	}
+});
+
+// INFO: La posicion (0, 0) del raton es la esquina izquierda de la ventana
+// [IMP] Rango pitch y yaw +/-90°
+window.addEventListener('mousemove', function(event) {
+
+	// Solo se tiene en cuenta si el movimiento se produce dentro del grafico
+	if(isClicked && event.clientX <= width && event.clientY <= height){
+		let angRot = 0.5; // Incremento o decremento entre cada rotacion
+
+		// Rotacion eje X
+		if(event.clientY > center[1] && yaw <= 90){
+			center[1] = event.clientY;
+			yaw += angRot;
+
+		} else if(event.clientY < center[1] && yaw >= -90) {
+			center[1] = event.clientY;
+			yaw -= angRot;
+		}
+
+		// Rotacion eje Y
+		if(event.clientX > center[0] && pitch <= 90){
+			center[0] = event.clientX;
+			pitch += angRot;
+
+		} else if(event.clientX < center[0] && pitch >= -90) {
+			center[0] = event.clientX;
+			pitch -= angRot;
+		}		
+		
+		let rotX = rotate(yaw, vec3(1.0, 0.0, 0.0));
+		let rotY = rotate(pitch, vec3(0.0, 1.0, 0.0));
+		let rot = mult(rotY, rotX); // Intrinseca
+		aux_view = mult(rot, view); // No actualizamos la view original
+		
+		gl.uniformMatrix4fv(programInfo.uniformLocations.view, gl.FALSE, aux_view);
+	}
 });
 
 //----------------------------------------------------------------------------
@@ -340,6 +428,7 @@ function render() {
 	T = translate(1.0, 0.0, 3.0);
 	objectsToDraw[3].uniforms.u_model = mult(R, T);
 
+	// Generacion de los nCubes
 	for(var j=0; j<nCubes; j++){
 		var i = j+4;
 		// TransformedV = TranslationMatrix*RotationMatrix*ScaleMatrix*OriginalV
