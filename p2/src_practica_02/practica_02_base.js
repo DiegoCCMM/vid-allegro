@@ -147,8 +147,6 @@ var view = new mat4();   		// create a view matrix and set it to the identity ma
 var projection = new mat4();	// create a projection matrix and set it to the identity matrix
 
 var eye, target, up;			// for view matrix
-var z = 16.0;
-var aux = 1.0;
 
 var rotAngle = 0.0;
 var rotChange = 0.6;
@@ -289,31 +287,37 @@ window.onload = function init() {
 };
 
 //----------------------------------------------------------------------------
-// Rendering Event Function
+// Manejo de interacciones
 //----------------------------------------------------------------------------
-var uuuu = 3.0;
-var aux = 1;
+
 window.addEventListener('keydown', function(event) {
+	x = 0, z = 0;
 	switch(event.code){
 		case 'ArrowUp':
-			z--;
-			/*for(var i=0; i<nCubes; i++){
-				cubeTraslation[i][2]--;
-			}
-			uuuu--;*/
-			aux = -1;
+			z = -0.3;
 			break;
 		
 		case 'ArrowDown':
-			z++;
-			/*for(var i=0; i<nCubes; i++){
-				cubeTraslation[i][2]++;
-			}
-			uuuu++;*/
-			aux = 1;
+			z = 0.3;
+			break;
+
+		case 'ArrowRight':
+			x = 0.3;
+			break;
+
+		case 'ArrowLeft':
+			x = -0.3;
 			break;
 	}
+
+	// Set up camera
+	view = mult(inverse4(translate(x, 0, z)), view);
+	gl.uniformMatrix4fv(programInfo.uniformLocations.view, gl.FALSE, view);
 });
+
+//----------------------------------------------------------------------------
+// Rendering Event Function
+//----------------------------------------------------------------------------
 
 function render() {
 
@@ -321,7 +325,7 @@ function render() {
 	
 	//----------------------------------------------------------------------------
 	// MOVE STUFF AROUND
-	//----------------------------------------------------------------------------
+	//----------------------------------------------------------------------------	
 
 	// se actualiza su posición cambiando su matriz del modelo. También se podría aquí, por ejemplo, actualizar la cámara, cambiando la matriz de la vista, o la de proyección.
 
@@ -329,14 +333,8 @@ function render() {
 	let R = rotate(rotAngle, ejeY);	
 
 	// Cubo que gira sobre si mismo
-	let T = translate(1.0, 1.0, uuuu);
-	objectsToDraw[2].uniforms.u_model = T;
-
-	let cambioPosicionZ = mat4();
-
-	cambioPosicionZ[2][3] = aux;
-	objectsToDraw[2].uniforms.u_model = mult(inverse4(cambioPosicionZ),objectsToDraw[2].uniforms.u_model);
-	aux = 0;
+	let T = translate(1.0, 1.0, 3.0);
+	objectsToDraw[2].uniforms.u_model = mult(T, R);
 	
 	// Cubo que gira entorno al eje de coordenadas
 	T = translate(1.0, 0.0, 3.0);
@@ -375,20 +373,8 @@ function render() {
     });	
     
 	rotAngle += rotChange;
-
-	// Set up camera
-	// Projection matrix
-	//projection = perspective( 45.0, canvas.width/canvas.height, 0.1, 100.0 );
-	//gl.uniformMatrix4fv( programInfo.uniformLocations.projection, gl.FALSE, projection ); // copy projection to uniform value in shader
-	// View matrix (vista cam)
-	eye = vec3(-5.0, 5.0, z);
-	target =  vec3(0.0, 0.0, 0.0);
-	up =  vec3(0.0, 1.0, 0.0);
-	view = lookAt(eye,target,up);
-	gl.uniformMatrix4fv(programInfo.uniformLocations.view, gl.FALSE, view);
 	
-	requestAnimationFrame(render);
-	
+	requestAnimationFrame(render);	
 }
 
 //----------------------------------------------------------------------------
