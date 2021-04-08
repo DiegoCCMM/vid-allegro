@@ -143,6 +143,8 @@ for(var i=0; i<nCubes; i++){
 //----------------------------------------------------------------------------
 var width, height;
 
+var fov = 45.0;										//value of the fov for the pespective camera
+
 var model = new mat4();   		// create a model matrix and set it to the identity matrix
 var view = new mat4();   		// create a view matrix and set it to the identity matrix
 var projection = new mat4();	// create a projection matrix and set it to the identity matrix
@@ -275,7 +277,8 @@ window.onload = function init() {
 	// Set up camera
 	// Projection matrix
 	// Se crean las matrices de proyección y de la vista iniciales
-	projection = perspective( 45.0, canvas.width/canvas.height, 0.1, 100.0 );
+	projection = perspective( fov, canvas.width/canvas.height, 0.1, 100.0 );
+
 	gl.uniformMatrix4fv( programInfo.uniformLocations.projection, gl.FALSE, projection ); // copy projection to uniform value in shader
     // View matrix (static cam)
 	eye = vec3(-5.0, 5.0, 16.0);
@@ -294,44 +297,80 @@ window.onload = function init() {
 
 // Teclas
 window.addEventListener('keydown', function(event) {
+	var matrix;
 	let x = 0, z = 0;
 	switch(event.code){
 		case 'ArrowUp':
+			//nos acercamos
 			console.log("Up pressed");
 			z = -0.3;
 			break;
 		
 		case 'ArrowDown':
+			//nos alejamos
 			console.log("Down pressed");
 			z = 0.3;
 			break;
 
 		case 'ArrowRight':
+			//movimiento lateral a derecha
 			console.log("Right pressed");
 			x = 0.3;
 			break;
 
 		case 'ArrowLeft':
+			//movimiento lateral a izquierda
 			console.log("Left pressed");
 			x = -0.3;
 			break;
 
 		case 'KeyP':
 			console.log("P pressed");
+			//cambiar camara a perspectiva
+			projection = perspective( fov, width/height, 0.1, 100.0 );
+
+			gl.uniformMatrix4fv( programInfo.uniformLocations.projection, gl.FALSE, projection ); // copy projection to uniform value in shader
 			break;
 
 		case 'KeyO':
 			console.log("O pressed");
+			//cambiar camara a ortografica
+			var left = -16;
+			var right = 16;
+			var bottom = -8;
+			var top = 8;
+			var near = 0.1;
+			var far = 100.0;
+
+			projection = ortho( left, right, bottom, top, near, far );
+			
+    		gl.uniformMatrix4fv( programInfo.uniformLocations.projection, gl.FALSE, projection ); // copy projection to uniform value in shader
 			break;
 
 		case 'NumpadAdd':
 		case 'BracketRight':
 			console.log("+ pressed");
+			//más FOV en la camara perspectiva
+			if ( fov < 90 ) {
+				console.log(" entered ");
+				fov = fov + 1;
+			}
+			projection = perspective( fov, width/height, 0.1, 100.0 );
+    		
+			gl.uniformMatrix4fv( programInfo.uniformLocations.projection, gl.FALSE, projection ); // copy projection to uniform value in shader	
 			break;
 
 		case 'NumpadSubtract':
 		case 'Slash':
 			console.log("- pressed");
+			//menos FOV en la camara perspectiva
+			if ( fov > -90 ) {
+				console.log(" entered ");
+				fov = fov - 1;
+			}
+			projection = perspective( fov, width/height, 0.1, 100.0 );
+    		
+			gl.uniformMatrix4fv( programInfo.uniformLocations.projection, gl.FALSE, projection ); // copy projection to uniform value in shader
 			break;
 	}
 
