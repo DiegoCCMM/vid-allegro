@@ -138,7 +138,7 @@ void main() {
         vec3 spec = vec3(1.0, 1.0, 1.0) * pow(max(dot(vNormal, h), 0.0), pow(roughness,-1.0));
     
         // Total Color:
-        finalColor += (1.0/pow(r, 2.0))*(diff + spec)*lightColors[i]*max(dot(vNormal, l), 0.0);
+        finalColor += (1.0/pow(r, 2.0)) * (diff + spec) * lightColors[i] * max(dot(vNormal, l), 0.0);
 
     }
     

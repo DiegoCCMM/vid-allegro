@@ -73,15 +73,24 @@
 // attribute vec3 normal;
 // attribute vec2 uv;
 
-attribute vec3 tangent;
+attribute vec3 tangent; 
 attribute vec3 tangent2;
 
 // Declarar aqui varying necesarias para la resolucion
-
+varying vec2 vUv;
+varying vec3 vNormal; // normal del vertice en espacio de la camara
+varying vec4 vPosition; // posicion del vertice en espacio de la camara
+varying vec3 vTangent; // tangente
+varying vec3 vTangent2; // bitangente
 
 void main() {
 	
 	// Calculos para dar valor a las varying aqui
+    vUv = uv;
+    vNormal = normalize(normalMatrix * normal);
+    vPosition = modelViewMatrix * vec4(position, 1.0);
+    vTangent = normalize(normalMatrix * tangent); // tangente
+    vTangent2 = normalize(normalMatrix * tangent2); // bitangente
 
     // El vertex shader debe proporcionar gl_Position (en espacio homogeneo o de pantalla)
     // Transformar posiciones a espacio homogeneo
@@ -117,7 +126,11 @@ uniform sampler2D diffuseTexture;
 uniform sampler2D normalMap;
 
 // Declarar aqui varying necesarias para la resolucion
-
+varying vec2 vUv;
+varying vec3 vNormal; // normal del vertice en espacio de la camara
+varying vec4 vPosition; // posicion del vertice en espacio de la camara
+varying vec3 vTangent; // tangente
+varying vec3 vTangent2; // bitangente
 
 vec3 to_sRGB(vec3 c) { return pow(c, vec3(1.0/2.2)); }
 vec3 from_sRGB(vec3 c) { return pow(c, vec3(2.2)); }
@@ -125,10 +138,38 @@ vec3 from_sRGB(vec3 c) { return pow(c, vec3(2.2)); }
 void main() {
 	
 	vec3 finalColor = vec3(0.0, 0.0, 0.0);
+
+    // matriz de transformación del ESPACIO TANGENTE a la CAMARA
+    mat3 transMatrix = mat3(vTangent, vTangent2, vNormal);
 	
-	// Calculos necesarios para obtener la normal de la textura en espacio de la camara aqui
-	
-	// Calculos necesarios para la iluminacion aqui
+	// normal de la textura en espacio tangente
+    vec3 normalText = texture2D(normalMap, vUv).rgb - vec3(0.5,0.5,0.5);
+    normalText.y *= -1.0; // al estar las normales en formato DirectX, se invierte la 'y'/G
+    // regular la fuerza o intensidad del normal map
+    normalText.x *= bumpiness;
+    normalText.y *= bumpiness;
+    // normal de la textura en espacio de la camara
+    normalText = normalize(transMatrix * normalText);
+
+
+    for (int i = 0; i < NUM_LIGHTS; i++) {    
+    
+        // Calculos para la iluminacion
+        vec3 l = normalize(lightPositions[i] - vec3(vPosition)); // vector que va del punto a la luz
+        float r = distance(lightPositions[i], vec3(vPosition)); // distancia entre la luz y el punto
+    
+        // Diffuse
+        vec3 diff = from_sRGB(texture2D(diffuseTexture, vUv).rgb); // coeficiente de reflexión difusa
+        
+        // Specular
+        vec3 v = normalize(vec3(0.0, 0.0, 0.0) - vec3(vPosition)); // vector que va del punto a la cámara (0 - vPosition)
+        vec3 h = normalize((l+v)/length(l+v)); // vector bisectriz del ángulo formado por v y l
+        vec3 spec = vec3(1.0, 1.0, 1.0) * pow(max(dot(normalText, h), 0.0), pow(roughness,-1.0));
+    
+        // Total Color:
+        finalColor += (1.0/pow(r, 2.0)) * (diff + spec) * lightColors[i] * max(dot(normalText, l), 0.0);
+
+    }
     
     // finalColor debe acabar conteniendo la intensidad/color resultante en el fragment
     
